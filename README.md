@@ -1,42 +1,136 @@
-# Sumana Panuganti — Research Lab
+# Sumana Panuganti — Research Portfolio
 
-An interactive, responsive personal research portfolio for research-assistant applications and AI safety fellowship materials.
+An interactive research portfolio covering applied AI, remote sensing, energy systems and AI safety. It contains four working research labs, project case studies, an experience timeline and a printable CV.
 
-## Quick start
+**Live site:** `https://sumana16713.github.io/research-lab/` (after GitHub Pages is enabled, see [Deployment](#deployment))
 
-Open `index.html` in a modern browser. No framework, package installation, API key, login, or backend is required. The website works offline except for its optional Google Fonts request (system font fallback is provided).
+![Home page](docs/screenshots/home.jpg)
 
-## Deploy for free with GitHub Pages
+## The four labs
 
-1. Create a public GitHub repository (for example `research-lab`).
-2. Upload `index.html`, `style.css`, and `app.js` to the repository root.
-3. Open repository **Settings → Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**, then select `main` and `/ (root)`.
-5. After deployment, the site should appear at `https://YOUR-USERNAME.github.io/research-lab/` (replace with your username and repository name).
+| Lab | Research question | Data |
+|---|---|---|
+| **Human oversight in critical infrastructure** (flagship) | When should an AI system act on its own in critical infrastructure, and when should human oversight be mandatory? | Hypothetical scenarios |
+| **SkyAcres: geospatial crop intelligence** | Can satellite-derived indicators give early, honest warnings of crop stress, including saying when the data is too poor to tell? | Synthetic |
+| **Solar, storage and grid reliability** | How much storage does a solar-heavy site need before reliability stops depending on the grid? | Simplified model |
+| **AgriOne: farmer funding access** | Which barriers keep farmers from funding they are eligible for, and which can software remove? | Fictional programs and personas |
 
-## Interactive features
+| AI safety sandbox | SkyAcres |
+|---|---|
+| ![AI safety sandbox](docs/screenshots/safety.jpg) | ![SkyAcres](docs/screenshots/skyacres.jpg) |
+| **Energy systems** | **AgriOne** |
+| ![Energy lab](docs/screenshots/energy.jpg) | ![AgriOne lab](docs/screenshots/agrione.jpg) |
 
-- Synthetic vegetation grid and NDVI-style metrics controlled by modeled season, water, and field variability.
-- Renewable-energy day profile comparing modeled solar output, demand, and an idealized limited battery discharge.
-- AI safety oversight policy sandbox with risk, model confidence, thresholds, and authorization gates.
-- Fictional farmer funding barrier explorer with transparent example rules.
+Each model is documented in full, with equations, assumptions and limitations, in [`docs/MODELS.md`](docs/MODELS.md).
 
-## Accuracy, integrity, and privacy
+## Honesty and data provenance
 
-**IMPORTANT:** All dashboards are illustrative interactive demonstrations created for this portfolio. They are *not* recovered prior professional code, validated research outputs, actual satellite imagery, working grid control models, or real grant eligibility systems. Do not describe the models or their outputs as real-world evidence.
+This repository keeps real experience separate from new demonstrations:
 
-The SkyAcres, AgriOne, NASA MINDS, and energy descriptions summarize past or continuing experience; refine individual claims using approved documentation before public publication. Do not publish confidential code, interview transcripts, company datasets, private research files, or material owned by former employers without permission.
+- **Past work** (SkyAcres / SkyHarvest at Albany State University, NASA MINDS crater detection, AgriOne discovery research, clean energy infrastructure planning) is described using only facts I can confirm. Original code, data and quantitative results from those projects are **not** included or reproduced.
+- **The interactive labs are new, independently built demonstrations.** They are not reconstructions of original project code.
+- **All lab data is synthetic, hypothetical or fictional**, and each lab says so on screen. No interview statistics, grant awards, yields or operational results are shown.
+- **The simulations are deterministic.** Every random draw uses a fixed seed, so the same inputs always produce the same outputs.
 
-The site does not request or store visitor data. No analytics scripts or third-party tracking are included.
+## Architecture
 
-## Before publishing
+A static site with no build step and no runtime dependencies: plain HTML, CSS and JavaScript modules. It loads fast, deploys to GitHub Pages as-is, and has nothing to keep up to date.
 
-- Add verified email, LinkedIn, GitHub URL, and CV download after checking them.
-- Replace decorative illustrations with licensed or personally owned figures if desired.
-- Verify all roles, projects, and dates against your resume.
-- Include links to legitimate research reports, documentation, or independently built notebooks when available.
-- Test on mobile and desktop; run browser accessibility checks.
+```
+index.html                 Page shell, navigation, footer
+assets/
+  css/
+    fonts.css              Self-hosted fonts (Newsreader, Public Sans; SIL OFL)
+    base.css               Design tokens, typography, buttons, layout primitives
+    home.css               Home page, projects, timeline, CV, case studies
+    labs.css               Lab instruments: controls, charts, tables, diagrams
+    print.css              Print and "save as PDF" styles (CV-only mode)
+  fonts/                   WOFF2 font files and licenses
+  js/
+    main.js                Hash router (#/, #/s/<section>, #/lab/<id>, #/project/<id>)
+    content.js             ALL editable site content (see "Updating content")
+    hero.js                Animated research-network canvas
+    lib/
+      dom.js               Escaping, form controls, downloads, screen-reader announcements
+      charts.js            Reusable SVG line / stacked-area / bar charts with keyboard tooltips
+      rng.js               Seeded random numbers and noise
+    models/                Pure simulation logic, no DOM access (unit-tested)
+      safety-model.js      Oversight gating, sensitivity grid, threshold Monte Carlo
+      ndvi-model.js        NDVI phenology, stress, synthetic scene, zonal statistics
+      energy-model.js      Hourly solar + battery + grid dispatch
+      agrione-model.js     Barrier framework, fictional programs, eligibility screener
+    labs/                  One UI module per lab (loaded on demand)
+    views/                 Home, case-study and lab-shell renderers
+docs/
+  MODELS.md                Model documentation: equations, assumptions, limitations
+  screenshots/             Images used in this README
+tests/
+  models.test.mjs          Unit tests for the models (Node built-in test runner)
+  e2e.py                   Browser test that clicks every control on desktop and mobile
+.github/workflows/tests.yml  Runs the model unit tests on every push
+```
 
-## Design
+Models are kept separate from the interface so they can be tested and read on their own.
 
-Dark navy research-lab aesthetic, mint accents, responsive cards, readable status indicators, keyboard-operated native controls, reduced-motion support, no dependency on paid website hosting.
+## Running locally
+
+Any static file server works. ES modules need to be served over HTTP, so opening `index.html` directly from disk will not load the labs.
+
+```bash
+# from the repository root
+python3 -m http.server 8000
+# then open http://localhost:8000
+```
+
+or `npx serve .`
+
+## Tests
+
+```bash
+npm test                      # unit tests for all four models (Node 18+, no install needed)
+
+# end-to-end: clicks every control on every page at desktop and mobile sizes
+pip install playwright && python -m playwright install chromium
+python3 -m http.server 8765 &
+python3 tests/e2e.py http://localhost:8765/
+```
+
+At the time of writing: 13/13 unit tests and 105/105 end-to-end checks pass, with no JavaScript errors.
+
+## Deployment
+
+The site is plain static files at the repository root, so GitHub Pages serves it directly with no build step.
+
+1. On GitHub, open **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**, then choose `main` and `/ (root)`, and save.
+3. After a minute or two the site is live at `https://sumana16713.github.io/research-lab/`. Every push to `main` redeploys it.
+
+`.nojekyll` tells Pages to serve the files as-is. All paths are relative, so the site also works under a custom domain. The `Tests` workflow in `.github/workflows/tests.yml` runs the model unit tests on every push.
+
+## Updating content
+
+Almost everything you read on the site lives in **`assets/js/content.js`**:
+
+- `person`: name, headline, introduction, LinkedIn / GitHub / email links, optional CV PDF path
+- `education`, `experience`, `skills`: the timeline, skill filter and CV
+- `projects`: project cards and case studies (`kind: 'past'` or `'demo'`)
+- `agenda`, `interests`, `labs`: research agenda, interests and lab index
+
+Leave a field empty rather than guessing; empty fields are not rendered. To show a PDF CV, add the file (for example `assets/Sumana-Panuganti-CV.pdf`) and set `person.links.cvPdf`. To show an email address, set `person.links.email`.
+
+Lab text (scenarios, hypotheses, limitations) lives at the top of each file in `assets/js/labs/`. Model parameters live in `assets/js/models/`. Run `npm test` after changing a model.
+
+## Accessibility
+
+- Keyboard-operable throughout: visible focus, skip link, native form controls, `<details>` expanders
+- Charts can be inspected with the arrow keys; status changes are announced to screen readers
+- Respects `prefers-reduced-motion` (the hero network becomes a still image)
+- Colour is never the only signal: every status also has a text label
+- Responsive from 360 px phones to wide desktops
+
+## Licensing
+
+- **Code:** choose a license before making the repository public. MIT is a common choice for portfolio code; add a `LICENSE` file if you want others to be able to reuse it.
+- **Written content and images** (biography, case studies, screenshots): all rights reserved unless you state otherwise.
+- **Fonts:** Newsreader and Public Sans are under the SIL Open Font License 1.1 (see `assets/fonts/`).
+- **Data:** all data in the labs is generated by the code in `assets/js/models/`. No third-party datasets are included.

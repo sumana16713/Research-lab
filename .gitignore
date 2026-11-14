@@ -1,0 +1,16 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Dependencies and caches (none are needed to run the site)
+node_modules/
+__pycache__/
+.pytest_cache/
+
+# Local test artifacts
+test-results/
+playwright-report/
+*.log

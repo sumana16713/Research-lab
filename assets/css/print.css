@@ -1,0 +1,9 @@
+/* Print: by default print the current page cleanly; with body.print-cv print only the CV sheet. */
+@page { margin: 16mm; }
+body { background: #fff !important; color: #111 !important; }
+.site-nav, .site-footer, .skip-link, .hero-figure, .btn, .chips, .seg, .lab-switch, .controls, .cv-actions { display: none !important; }
+a { color: #0d5c55 !important; }
+body.print-cv main > *:not(#cv) { display: none !important; }
+body.print-cv #cv .section-head { display: none !important; }
+body.print-cv #cv { padding: 0 !important; }
+body.print-cv .cv-sheet { box-shadow: none !important; padding: 0 !important; max-width: none !important; background: #fff !important; }
