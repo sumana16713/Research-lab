@@ -9,7 +9,9 @@ import {
 import { esc, $, $$, slider, toggle, select, readControl, syncOutputs, details, download, announce, fmt } from '../lib/dom.js';
 import { lineChart } from '../lib/charts.js';
 
-const OUTCOME_COLOR = { auto: 'var(--teal)', 'auto-veto': 'var(--cyan)', human: 'var(--blue)', 'human-2': '#a9b8ff', fallback: 'var(--amber)' };
+// Black, ivory and burnt orange: automation light, human decisions dark, fallback in orange
+const OUTCOME_COLOR = { auto: '#e2dccd', 'auto-veto': '#c4bdab', human: '#6b6c62', 'human-2': '#34362f', fallback: '#b65c3a' };
+const MX_LABEL = { thermal: [-11, 4, 'end'], frequency: [0, -12, 'middle'], restoration: [11, 4, 'start'], forecast: [11, 4, 'start'], cyber: [-11, 16, 'end'] };
 const SITUATION_KEYS = ['confidence', 'uncertainty', 'severity', 'harm', 'timeWindow'];
 
 const FAILURES = [
@@ -115,7 +117,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="fail-h">
     <h2 id="fail-h" class="block-h">3. Inject a failure</h2>
-    <p class="dim">See how the current policy behaves when something goes wrong, and what recovery looks like.</p>
+    <p class="margin-note">See how the current policy behaves when something goes wrong, and what recovery looks like.</p>
     <div class="seg" role="group" aria-label="Failure modes">
       ${FAILURES.map((f) => `<button class="seg-btn" data-failure="${f.id}" aria-pressed="false">${esc(f.label)}</button>`).join('')}
       <button class="seg-btn" data-failure="" aria-pressed="true">No failure</button>
@@ -125,7 +127,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="cmp-h">
     <h2 id="cmp-h" class="block-h">4. Compare two configurations</h2>
-    <p class="dim">Save the current scenario and policy as A or B, then change something and compare.</p>
+    <p class="margin-note">Save the current scenario and policy as A or B, then change something and compare.</p>
     <div class="control-actions">
       <button class="btn" data-action="save-A">Save current as A</button>
       <button class="btn" data-action="save-B">Save current as B</button>
@@ -160,6 +162,20 @@ export function mount(root) {
     <div id="audit"></div>
   </section>
 
+
+  <section class="lab-block" aria-labelledby="ex-h">
+    <h2 id="ex-h" class="block-h">How the gate reads a situation</h2>
+    <p class="margin-note">Scroll through the four steps. The diagram highlights the part of the model each step describes, using the scenario selected above.</p>
+    <div class="explainer">
+      <figure class="explainer-fig panel"><h3 class="panel-h">The gate, step by step</h3><div id="ex-fig"></div></figure>
+      <ol class="explainer-steps">
+        <li data-ex="input"><span class="mono">Step 1</span><h3>The model proposes an action</h3><p>Every decision starts with a proposed action and the model's own confidence in it. Confidence alone is not trusted: it is what the model believes, not what is true.</p></li>
+        <li data-ex="score"><span class="mono">Step 2</span><h3>Confidence is discounted, impact is weighed</h3><p>Uncertainty about whether the input looks like anything the model has seen reduces confidence. Severity and irreversibility set how much a mistake would cost. Together they give the risk index.</p></li>
+        <li data-ex="gate"><span class="mono">Step 3</span><h3>The escalation rules are checked</h3><p>Any one rule is enough to require a person: unfamiliar input, a hard-to-reverse action, low effective confidence, or risk above the threshold. Rules that do not depend on confidence matter most when the model is overconfident.</p></li>
+        <li data-ex="review"><span class="mono">Step 4</span><h3>A person decides, if there is time</h3><p>Oversight only works if review fits inside the time before harm occurs. When it does not, the policy falls back to a predefined safe state. That trade-off, between speed and accountability, is the core of the study.</p></li>
+      </ol>
+    </div>
+  </section>
   <section class="lab-block research" aria-labelledby="res-h">
     <h2 id="res-h" class="block-h">Research framing</h2>
     <div class="two-col">
@@ -224,7 +240,7 @@ export function mount(root) {
     return `<div class="meter"><dt>${esc(label)} <span class="small dim">${esc(formula)}</span></dt><dd><span class="meter-track"><span class="meter-fill" style="width:${(v * 100).toFixed(1)}%"></span>${mark != null ? `<span class="meter-mark" style="left:${Math.min(100, mark * 100)}%" title="Threshold τ"></span>` : ''}</span><span class="meter-val">${v.toFixed(2)}</span></dd></div>`;
   }
 
-  function renderPathway(r) {
+  function renderPathway(r, target = $('#pathway', root)) {
     const on = new Set(r.path);
     const N = [
       { id: 'input', x: 20, y: 70, label: 'Model proposes action' },
@@ -244,7 +260,7 @@ export function mount(root) {
       return `<path class="pw-link${active ? ' on' : ''}" d="${d}"/>`;
     };
     const p = r.path;
-    $('#pathway', root).innerHTML = `<svg viewBox="0 0 700 250" class="pathway" role="img" aria-label="Decision pathway. Active path: ${esc(p.join(' to '))}">
+    target.innerHTML = `<svg viewBox="0 0 700 250" class="pathway" role="img" aria-label="Decision pathway. Active path: ${esc(p.join(' to '))}">
       ${link('input', 'score', true)}${link('score', 'gate', true)}
       ${link('gate', 'auto', on.has('auto'))}${link('gate', 'veto', on.has('veto'))}${link('gate', 'human', on.has('human'))}
       ${N.slice(0, 7).map(box).join('')}${box(N[7])}
@@ -270,12 +286,12 @@ export function mount(root) {
     for (let i = 0; i < steps; i++) for (let j = 0; j < steps; j++) {
       const pe = (i + 0.5) / steps, imp = (j + 0.5) / steps;
       const risk = pe * imp;
-      cells.push(`<rect x="${X(i / steps)}" y="${Y((j + 1) / steps)}" width="${iw / steps}" height="${ih / steps}" fill="${risk > tau ? 'rgba(117,147,255,' + (0.06 + risk * 0.35).toFixed(2) + ')' : 'rgba(79,193,181,0.05)'}"/>`);
+      cells.push(`<rect x="${X(i / steps)}" y="${Y((j + 1) / steps)}" width="${iw / steps}" height="${ih / steps}" fill="${risk > tau ? 'rgba(182,92,58,' + (0.05 + risk * 0.3).toFixed(2) + ')' : 'rgba(233,229,219,0.5)'}"/>`);
     }
     const dots = SCENARIOS.map((s) => {
       const isCur = s.id === scenario.id;
       const ix = isCur ? computeIndices(situation) : computeIndices(s);
-      return `<g class="mx-dot${isCur ? ' cur' : ''}"><circle cx="${X(1 - ix.cEff)}" cy="${Y(ix.impact)}" r="${isCur ? 8 : 5}" fill="${isCur ? OUTCOME_COLOR[r.outcome] : 'var(--muted)'}"/><text x="${X(1 - ix.cEff) + (1 - ix.cEff > 0.6 ? -11 : 11)}" y="${Y(ix.impact) + 4}" text-anchor="${1 - ix.cEff > 0.6 ? 'end' : 'start'}">${esc(s.short)}</text></g>`;
+      return `<g class="mx-dot${isCur ? ' cur' : ''}"><circle cx="${X(1 - ix.cEff)}" cy="${Y(ix.impact)}" r="${isCur ? 8 : 5}" fill="${isCur ? OUTCOME_COLOR[r.outcome] : 'var(--muted)'}"/><text x="${X(1 - ix.cEff) + MX_LABEL[s.id][0] * (isCur ? 1.3 : 1)}" y="${Y(ix.impact) + MX_LABEL[s.id][1] * (isCur ? 1.3 : 1)}" text-anchor="${MX_LABEL[s.id][2]}">${esc(s.short)}</text></g>`;
     }).join('');
     $('#matrix', root).innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="matrix" role="img" aria-label="Risk matrix: probability of error against impact, with the oversight threshold curve.">
       ${cells.join('')}
@@ -355,7 +371,7 @@ export function mount(root) {
     const S = 300, m = 40, cs = (S - m) / steps;
     const rects = cells.map((c) => {
       const i = Math.floor(c.confidence * steps), j = Math.floor(c.uncertainty * steps);
-      return `<rect x="${m + i * cs}" y="${(steps - 1 - j) * cs}" width="${cs + 0.3}" height="${cs + 0.3}" fill="${OUTCOME_COLOR[c.outcome]}" fill-opacity="0.72"><title>c=${c.confidence.toFixed(2)}, u=${c.uncertainty.toFixed(2)}: ${OUTCOME_LABEL[c.outcome]}</title></rect>`;
+      return `<rect x="${m + i * cs}" y="${(steps - 1 - j) * cs}" width="${cs + 0.3}" height="${cs + 0.3}" fill="${OUTCOME_COLOR[c.outcome]}" fill-opacity="0.9"><title>c=${c.confidence.toFixed(2)}, u=${c.uncertainty.toFixed(2)}: ${OUTCOME_LABEL[c.outcome]}</title></rect>`;
     }).join('');
     const cx = m + situation.confidence * (S - m), cy = (1 - situation.uncertainty) * (S - m);
     const present = [...new Set(cells.map((c) => c.outcome))];
@@ -383,8 +399,8 @@ export function mount(root) {
         x: { values: sweep.map((s) => s.tau), format: (v) => v.toFixed(2), label: 'Oversight threshold τ' },
         y: { min: 0, max: 1, format: (v) => `${Math.round(v * 100)}%` },
         series: [
-          { name: 'Automation rate', values: sweep.map((s) => s.automationRate), color: 'var(--teal)' },
-          { name: 'Residual harm (scaled to its maximum)', values: sweep.map((s) => s.residualHarm / (maxHarm || 1)), color: 'var(--amber)', dash: '5 4' },
+          { name: 'Automation rate', values: sweep.map((s) => s.automationRate), color: 'var(--ink)' },
+          { name: 'Residual harm (scaled to its maximum)', values: sweep.map((s) => s.residualHarm / (maxHarm || 1)), color: 'var(--orange)', dash: '5 4' },
         ],
         vLine: policy.riskThreshold <= 0.4 ? cur : undefined,
         tooltip: (i) => `<strong>τ = ${sweep[i].tau.toFixed(2)}</strong><br>Automated: ${fmt.pct(sweep[i].automationRate)}<br>Residual harm: ${sweep[i].residualHarm.toFixed(4)} per decision`,
@@ -403,6 +419,7 @@ export function mount(root) {
   function updateAll({ sweep = true } = {}) {
     syncOutputs(root, { humanLatency: (v) => `${v} s`, timeWindow: (v) => `${v} s`, overconfidence: (v) => v.toFixed(2) });
     renderDecision();
+    if (typeof renderExplainer === 'function') renderExplainer();
     renderFailure();
     renderHeatmap();
     if (sweep) renderSweep();
@@ -462,8 +479,23 @@ export function mount(root) {
     if (act === 'download-summary') download('human-oversight-research-summary.md', summaryMarkdown(), 'text/markdown');
   });
 
-  renderScenario(); renderSituationControls(); renderCompare(); renderAudit(); updateAll();
-  return () => clearTimeout(sweepTimer);
+  // Scroll-linked explanation: highlight the pathway stage each step describes
+  let exStage = 'input';
+  const exSteps = $$('.explainer-steps li', root);
+  function renderExplainer() {
+    const r = evaluate(situation, policy);
+    const stages = { input: ['input'], score: ['input', 'score'], gate: ['input', 'score', 'gate'], review: r.path };
+    renderPathway({ ...r, path: stages[exStage] }, $('#ex-fig', root));
+    exSteps.forEach((li) => li.classList.toggle('is-active', li.dataset.ex === exStage));
+  }
+  const io = new IntersectionObserver((entries) => {
+    const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+    if (vis && vis.target.dataset.ex !== exStage) { exStage = vis.target.dataset.ex; renderExplainer(); }
+  }, { rootMargin: '-35% 0px -45% 0px' });
+  exSteps.forEach((li) => io.observe(li));
+
+  renderScenario(); renderSituationControls(); renderCompare(); renderAudit(); updateAll(); renderExplainer();
+  return () => { clearTimeout(sweepTimer); io.disconnect(); };
 }
 
 function pick(s) { return Object.fromEntries(SITUATION_KEYS.map((k) => [k, s[k]])); }

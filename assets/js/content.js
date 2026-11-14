@@ -12,9 +12,16 @@
 export const person = {
   name: 'Sumana Panuganti',
   fields: ['Applied AI', 'Remote sensing', 'Energy systems', 'AI safety'],
-  headline: 'Engineering intelligent systems for a changing world',
+  tagline: 'Research, computation & systems.',
   intro:
-    "I'm a graduate student at Columbia University with a background in Computer Science and experience developing data-driven technologies across agriculture, geospatial intelligence, and energy systems. My research interests focus on building intelligent systems that are reliable, transparent, and useful in real-world environments.",
+    'A graduate student at Columbia University exploring how computational methods and intelligent systems can help us understand agriculture, energy, and complex human decisions.',
+  /** Short academic information panel on the home page. */
+  panel: [
+    ['Now', 'M.S. Technology Management, Columbia University. Expected December 2027.'],
+    ['Before', 'B.S. Computer Science and Business, Albany State University, 2024. GPA 3.7.'],
+    ['Undergraduate research', 'NASA MINDS and NASA Better Together (advisor Dr Robert Owor); Providencia Project (advisor Dr Ojo Olabisi).'],
+    ['Looking for', 'Research assistant roles at Columbia, and AI safety fellowships.'],
+  ],
   links: {
     linkedin: 'https://www.linkedin.com/in/sumana-panuganti-ab1907180/',
     github: 'https://github.com/sumana16713',
@@ -31,7 +38,7 @@ export const education = [
 /** Research agenda shown near the top of the home page. */
 export const agenda = {
   statement:
-    'The systems I care about make decisions, or shape them, in places where mistakes are costly: a crop plan, a grid dispatch, a funding application, an automated safety action. My question in each is the same: what does the system know, how sure is it, and who is accountable when it is wrong?',
+    'Most of the systems I have worked on turn imperfect measurements into decisions: a satellite index into a judgement about a field, a forecast into a battery dispatch, a set of interviews into a product requirement. I keep returning to the same three questions. What does the system actually know? How sure is it? And who answers for it when it is wrong?',
   questions: [
     { q: 'When should an automated system act on its own in critical infrastructure, and when must a person decide?', lab: 'safety' },
     { q: 'How can satellite-derived indicators give farmers early, honest warnings about crop stress, including saying when the data is too poor to tell?', lab: 'skyacres' },

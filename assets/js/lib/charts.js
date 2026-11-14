@@ -55,7 +55,7 @@ export function lineChart(container, opts) {
   const path = (vals) => vals.map((v, i) => `${i ? 'L' : 'M'}${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join('');
   const area = (hi, lo) => `${path(hi)}L${xs(n - 1)},${ys(lo ? lo[n - 1] : yMin)}${(lo || new Array(n).fill(yMin)).map((v, i) => [i, v]).reverse().map(([i, v]) => `L${xs(i).toFixed(1)},${ys(v).toFixed(1)}`).join('')}Z`;
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="${esc(opts.ariaLabel || 'Chart')}">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" class="chart" role="img" aria-label="${esc(opts.ariaLabel || 'Chart')}"><defs><pattern id="band-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="rgba(182,92,58,0.05)"/><line x1="0" y1="0" x2="0" y2="5" stroke="#b65c3a" stroke-width="0.6" stroke-opacity="0.45"/></pattern></defs>`;
   (opts.bands || []).forEach((b) => {
     const x0 = xs(Math.max(0, b.from - 0.5)), x1 = xs(Math.min(n - 1, b.to - 0.5));
     svg += `<rect x="${x0}" y="${M.top}" width="${Math.max(2, x1 - x0)}" height="${ih}" class="chart-band"/>`;
@@ -72,8 +72,9 @@ export function lineChart(container, opts) {
   if (opts.y.label) svg += `<text x="12" y="${M.top + ih / 2}" transform="rotate(-90 12 ${M.top + ih / 2})" text-anchor="middle" class="chart-axis-label">${esc(opts.y.label)}</text>`;
   if (opts.x.label) svg += `<text x="${M.left + iw / 2}" y="${H - 2}" text-anchor="middle" class="chart-axis-label">${esc(opts.x.label)}</text>`;
 
+  svg += `<line x1="${M.left}" x2="${W - M.right}" y1="${M.top + ih}" y2="${M.top + ih}" stroke="var(--ink)" stroke-width="1"/>`;
   drawn.filter((s) => s.area || s.stack).forEach((s) => {
-    svg += `<path d="${area(s.hi, s.lo)}" fill="${s.color}" fill-opacity="${s.stack ? 0.78 : 0.14}" stroke="none"/>`;
+    svg += `<path d="${area(s.hi, s.lo)}" fill="${s.color}" fill-opacity="${s.stack ? 0.85 : 0.12}" stroke="${s.stack ? 'var(--paper)' : 'none'}" stroke-width="${s.stack ? 0.6 : 0}"/>`;
   });
   drawn.filter((s) => !s.stack).forEach((s) => {
     svg += `<path d="${path(s.hi)}" fill="none" stroke="${s.color}" stroke-width="${s.width || 2}" ${s.dash ? `stroke-dasharray="${s.dash}"` : ''} stroke-linejoin="round" stroke-linecap="round"/>`;
@@ -91,7 +92,7 @@ export function lineChart(container, opts) {
   svg += '</svg>';
 
   const legend = opts.legend === false ? '' : `<ul class="chart-legend">${opts.series.filter((s) => s.name).map((s) =>
-    `<li><span class="swatch" style="background:${s.color};${s.dash ? 'height:2px;' : ''}"></span>${esc(s.name)}</li>`).join('')}</ul>`;
+    `<li><span class="swatch${s.stack || s.area ? '' : s.dash ? ' is-dash' : ' is-line'}" style="background:${s.color};border-color:${s.color}"></span>${esc(s.name)}</li>`).join('')}</ul>`;
 
   container.innerHTML = `<div class="chart-wrap">${legend}${svg}<div class="chart-tip" role="status" hidden></div></div>`;
 

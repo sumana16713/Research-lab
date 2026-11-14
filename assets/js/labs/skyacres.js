@@ -11,7 +11,8 @@ const SEASON_START = new Date(2025, 3, 1); // 1 April — illustrative planting 
 const dateOf = (day) => new Date(SEASON_START.getTime() + day * 864e5).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
 // NDVI colour ramp: bare soil → sparse → healthy canopy
-const RAMP = [[-0.05, [92, 64, 44]], [0.2, [165, 128, 82]], [0.35, [205, 190, 112]], [0.5, [140, 178, 86]], [0.65, [70, 150, 72]], [0.8, [28, 110, 58]], [0.95, [10, 70, 42]]];
+const RAMP = [[-0.05, [128, 101, 74]], [0.2, [176, 152, 114]], [0.35, [206, 192, 146]], [0.5, [168, 170, 112]], [0.65, [124, 130, 88]], [0.8, [86, 94, 58]], [0.95, [50, 58, 33]]];
+const METRES_PER_PIXEL = 10; // synthetic scale: one grid pixel = 10 m
 function rampColor(v) {
   for (let i = 1; i < RAMP.length; i++) {
     if (v <= RAMP[i][0]) {
@@ -57,6 +58,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="map-h">
     <h2 id="map-h" class="block-h">Field monitor</h2>
+    <p class="margin-note">One pixel is 10 m. Hover the plate to read the near-infrared and red reflectance behind each NDVI value. Choose a field on the plate or in the table to see its season.</p>
     <div class="instrument">
       <form class="controls" aria-label="Scene controls" onsubmit="return false">
         <fieldset><legend>Acquisition</legend>
@@ -92,7 +94,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="pipe-h">
     <h2 id="pipe-h" class="block-h">Processing pipeline</h2>
-    <p class="dim">Select a step to see what it does in a production system and how this lab implements it.</p>
+    <p class="margin-note">Select a step to see what it does in a production system and how this lab implements it.</p>
     <ol class="pipeline">${PIPELINE.map((p, i) => `<li><button class="pipe-step" data-pipe="${i}" aria-pressed="${i === 0}"><span class="n">${i + 1}</span>${esc(p[0])}</button></li>`).join('')}</ol>
     <div class="pipe-detail" id="pipe-detail" aria-live="polite"></div>
   </section>
@@ -114,40 +116,71 @@ export function mount(root) {
     for (let i = 0; i < scene.ndvi.length; i++) {
       let c;
       const v = scene.ndvi[i];
-      if (layer === 'ndvi') c = scene.cloud[i] ? [214, 220, 228] : rampColor(v);
+      if (layer === 'ndvi') c = scene.cloud[i] ? [246, 244, 238] : rampColor(v);
       else if (layer === 'rgb') {
         const veg = Math.max(0, Math.min(1, (v - 0.15) / 0.7));
-        c = [150 - veg * 110, 130 - veg * 40, 95 - veg * 55].map(Math.round);
-        if (scene.cloud[i]) c = [232, 236, 240];
-      } else c = scene.cloud[i] ? [227, 178, 91] : [24, 40, 68];
+        c = [176 - veg * 112, 156 - veg * 66, 118 - veg * 74].map(Math.round);
+        if (scene.cloud[i]) c = [246, 244, 238];
+      } else c = scene.cloud[i] ? [182, 92, 58] : [233, 229, 219];
       img.data.set([...c, 255], i * 4);
     }
     offCtx.putImageData(img, 0, 0);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(off, 0, 0, canvas.width, canvas.height);
 
+    // Graticule every 16 px (160 m), labelled in metres from the scene origin
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(37,39,34,0.22)';
+    ctx.fillStyle = 'rgba(37,39,34,0.75)';
+    ctx.font = '400 11px "IBM Plex Mono", monospace';
+    for (let gx = 16; gx < GRID_W; gx += 16) {
+      ctx.beginPath(); ctx.moveTo(gx * SCALE + 0.5, 0); ctx.lineTo(gx * SCALE + 0.5, canvas.height); ctx.stroke();
+      ctx.fillText(`${gx * METRES_PER_PIXEL} m`, gx * SCALE + 4, canvas.height - 6);
+    }
+    for (let gy = 16; gy < GRID_H; gy += 16) {
+      ctx.beginPath(); ctx.moveTo(0, gy * SCALE + 0.5); ctx.lineTo(canvas.width, gy * SCALE + 0.5); ctx.stroke();
+      ctx.fillText(`${gy * METRES_PER_PIXEL} m`, 4, gy * SCALE - 4);
+    }
+
     // Field boundaries and labels
     for (const p of PARCELS) {
       const [x0, y0, x1, y1] = p.rect.map((v) => v * SCALE);
       const sel = p.id === selected;
       const z = stats.find((s) => s.parcel.id === p.id);
-      ctx.lineWidth = sel ? 3 : 1.5;
-      ctx.strokeStyle = sel ? '#eee9dd' : 'rgba(238,233,221,0.55)';
+      ctx.lineWidth = sel ? 2.5 : 1;
+      ctx.strokeStyle = sel ? '#252722' : 'rgba(37,39,34,0.7)';
+      ctx.setLineDash(sel ? [] : [4, 3]);
       ctx.strokeRect(x0 + 0.5, y0 + 0.5, x1 - x0 - 1, y1 - y0 - 1);
+      ctx.setLineDash([]);
       const label = `${p.id} ${p.name}`;
-      ctx.font = '600 13px "Public Sans", system-ui, sans-serif';
+      ctx.font = `${sel ? 500 : 400} 12px "IBM Plex Mono", monospace`;
       const tw = ctx.measureText(label).width;
-      ctx.fillStyle = 'rgba(7,16,31,0.82)';
-      ctx.fillRect(x0 + 6, y0 + 6, tw + 30, 22);
-      ctx.fillStyle = { low: '#79c98f', moderate: '#e3b25b', high: '#e27b78', unknown: '#8592a8' }[z.risk.level];
-      ctx.beginPath(); ctx.arc(x0 + 16, y0 + 17, 4, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#eee9dd';
-      ctx.fillText(label, x0 + 25, y0 + 21.5);
+      ctx.fillStyle = sel ? '#252722' : 'rgba(244,241,234,0.92)';
+      ctx.fillRect(x0 + 6, y0 + 6, tw + 26, 20);
+      ctx.fillStyle = { low: '#777c58', moderate: '#c9971a', high: '#b65c3a', unknown: '#9a978c' }[z.risk.level];
+      ctx.fillRect(x0 + 12, y0 + 12, 8, 8);
+      ctx.fillStyle = sel ? '#f4f1ea' : '#252722';
+      ctx.fillText(label, x0 + 26, y0 + 20.5);
     }
+
+    // North arrow and scale bar
+    const W_ = canvas.width, H_ = canvas.height;
+    ctx.fillStyle = 'rgba(244,241,234,0.92)';
+    ctx.fillRect(W_ - 246, H_ - 58, 236, 48);
+    ctx.fillStyle = '#252722'; ctx.strokeStyle = '#252722'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(W_ - 30, H_ - 50); ctx.lineTo(W_ - 24, H_ - 32); ctx.lineTo(W_ - 30, H_ - 36); ctx.lineTo(W_ - 36, H_ - 32); ctx.closePath(); ctx.fill();
+    ctx.font = '500 11px "IBM Plex Mono", monospace'; ctx.fillText('N', W_ - 34, H_ - 18);
+    const bar = (200 / METRES_PER_PIXEL) * SCALE; // 200 m
+    const bx = W_ - 236, by = H_ - 34;
+    ctx.fillRect(bx, by, bar / 2, 4); ctx.strokeRect(bx + 0.5, by + 0.5, bar - 1, 4);
+    ctx.font = '400 10.5px "IBM Plex Mono", monospace';
+    ctx.fillText('0', bx, by - 6); ctx.fillText('200 m', bx + bar - 30, by - 6);
+    ctx.fillText('synthetic scene', bx, by + 18);
+
     $('#map-title', root).textContent = `${dateOf(cond.day)}, day ${cond.day} of the season`;
     $('#legend', root).innerHTML = layer === 'ndvi'
-      ? `<span>NDVI</span><span>0.0</span><span class="ramp" style="background:${RAMP_CSS}"></span><span>0.9</span><span class="swatch" style="background:#d6dce4"></span><span>Cloud (masked)</span>`
-      : layer === 'mask' ? '<span class="swatch" style="background:#e3b25b"></span><span>Masked pixel</span><span class="swatch" style="background:#182844"></span><span>Clear pixel</span>'
+      ? `<span>NDVI</span><span>0.0</span><span class="ramp" style="background:${RAMP_CSS}"></span><span>0.9</span><span class="swatch" style="background:#f6f4ee;border:1px solid #252722"></span><span>Cloud (masked)</span><span>Dashed outline: field boundary</span>`
+      : layer === 'mask' ? '<span class="swatch" style="background:#b65c3a"></span><span>Masked pixel</span><span class="swatch" style="background:#e9e5db;border:1px solid #252722"></span><span>Clear pixel</span>'
         : '<span>Simulated true colour, for orientation only. Analysis uses NDVI.</span>';
   }
 
@@ -176,11 +209,11 @@ export function mount(root) {
       x: { values: series.map((s) => s.day), format: (d) => dateOf(d), label: 'Date' },
       y: { min: 0, max: 1, format: (v) => v.toFixed(1), label: 'NDVI' },
       series: [
-        { name: 'Expected (normal season)', values: series.map((s) => s.baseline), color: 'var(--ivory-dim)', dash: '5 4', width: 1.5 },
-        { name: 'Current conditions', values: series.map((s) => s.ndvi), color: 'var(--teal)', area: true },
+        { name: 'Expected (normal season)', values: series.map((s) => s.baseline), color: 'var(--ink)', dash: '5 4', width: 1.3 },
+        { name: 'Current conditions', values: series.map((s) => s.ndvi), color: 'var(--olive)', area: true, width: 2 },
       ],
       vLine: curIdx,
-      points: z.valid ? [{ i: curIdx, y: series[curIdx].ndvi, color: 'var(--cyan)' }] : [],
+      points: z.valid ? [{ i: curIdx, y: series[curIdx].ndvi, color: 'var(--ink)', r: 4.5 }] : [],
       tooltip: (i) => `<strong>${dateOf(series[i].day)}</strong> (day ${series[i].day})<br>Expected: ${series[i].baseline.toFixed(2)}<br>Current: ${series[i].ndvi.toFixed(2)}<br>Difference: ${(series[i].ndvi - series[i].baseline).toFixed(2)}`,
     });
   }
@@ -261,7 +294,7 @@ export function mount(root) {
     const p = parcelAt(g.x, g.y);
     tip.hidden = false;
     tip.style.left = `${Math.min(g.px, g.rw - 190)}px`; tip.style.top = `${g.py}px`;
-    tip.innerHTML = `${p ? `<strong>${esc(p.id)} ${esc(p.name)}</strong> · ${esc(CROPS[p.crop].label)}` : '<strong>Outside fields</strong>'}<br>Pixel (${g.x}, ${g.y})${scene.cloud[i] ? '<br><span style="color:var(--amber)">Cloud — masked</span>' : `<br>NIR ${scene.nir[i].toFixed(3)} · Red ${scene.red[i].toFixed(3)}<br>NDVI ${scene.ndvi[i].toFixed(3)}`}`;
+    tip.innerHTML = `${p ? `<strong>${esc(p.id)} ${esc(p.name)}</strong>, ${esc(CROPS[p.crop].label.toLowerCase())}` : '<strong>Outside fields</strong>'}<br>x ${g.x * METRES_PER_PIXEL} m, y ${g.y * METRES_PER_PIXEL} m${scene.cloud[i] ? '<br><span style="color:var(--orange-text)">Cloud: masked</span>' : `<br>NIR ${scene.nir[i].toFixed(3)}&ensp;Red ${scene.red[i].toFixed(3)}<br>NDVI ${scene.ndvi[i].toFixed(3)}`}`;
     canvas.style.cursor = p ? 'pointer' : 'crosshair';
   });
   canvas.addEventListener('pointerleave', () => { tip.hidden = true; });

@@ -53,7 +53,14 @@ export function syncOutputs(root, formatters = {}) {
     const out = $(`[data-out="${el.dataset.key}"]`, root);
     if (!out) return;
     const f = formatters[el.dataset.key];
-    out.textContent = f ? f(Number(el.value)) : `${el.value}${el.dataset.unit || ''}`;
+    const next = f ? f(Number(el.value)) : `${el.value}${el.dataset.unit || ''}`;
+    if (out.textContent !== next && out.textContent) {
+      // Brief accent on the value that just changed, so the eye can find it
+      out.classList.add('changed');
+      clearTimeout(out._t);
+      out._t = setTimeout(() => out.classList.remove('changed'), 700);
+    }
+    out.textContent = next;
   });
 }
 

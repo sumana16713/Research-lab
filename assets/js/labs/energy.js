@@ -6,7 +6,8 @@ import { DEFAULT_ENERGY, simulate, reliabilityLabel } from '../models/energy-mod
 import { esc, $, $$, slider, readControl, syncOutputs, details, download, announce, fmt } from '../lib/dom.js';
 import { lineChart } from '../lib/charts.js';
 
-const COLORS = { solar: '#e3b25b', battery: '#86d9e6', grid: '#5c72c9', unserved: '#e27b78', demand: '#eee9dd', curtailed: '#8592a8', charge: '#4fc1b5' };
+// Engineering-drawing palette: solar ochre, storage blue, grid pale blue-grey, shortfall orange
+const COLORS = { solar: '#c9a24a', battery: '#617b89', grid: '#b9c3c8', unserved: '#b65c3a', demand: '#252722', curtailed: '#c8c2b3', charge: '#777c58' };
 
 const PRESETS = {
   sunny: { label: 'Clear summer day', set: { cloudiness: 5, peakDemandMW: 55, outageHours: 0 } },
@@ -45,6 +46,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="sim-h">
     <h2 id="sim-h" class="block-h">24-hour simulation</h2>
+    <p class="margin-note">Power is in MW and energy in MWh, in one-hour steps. Battery losses are split between charging and discharging. Every run is seeded, so the same settings always give the same day.</p>
     <div class="instrument">
       <form class="controls" aria-label="Energy system controls" onsubmit="return false">
         <fieldset><legend>Scenarios</legend>
@@ -73,7 +75,8 @@ export function mount(root) {
       </form>
       <div class="readout">
         <div id="kpis"></div>
-        <div class="panel"><h3 class="panel-h">Hourly supply and demand</h3><p class="small dim">Stacked areas show how demand is met each hour. The ivory line is demand.</p><div id="supply-chart"></div></div>
+        <div class="panel"><h3 class="panel-h">System diagram: energy flows over the day</h3><p class="small dim">Line widths are proportional to daily energy (MWh). Change any control to watch the flows rebalance.</p><div id="flow"></div></div>
+        <div class="panel"><h3 class="panel-h">Hourly supply and demand</h3><p class="small dim">Stacked areas show how demand is met each hour. The dark line is demand; the dashed line is everything the panels produced.</p><div id="supply-chart"></div></div>
         <div class="panel"><h3 class="panel-h">Battery state of charge</h3><div id="soc-chart"></div></div>
         <div class="panel"><h3 class="panel-h">Daily energy balance</h3><div id="balance"></div></div>
       </div>
@@ -82,7 +85,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="cmp-h">
     <h2 id="cmp-h" class="block-h">Compare scenarios</h2>
-    <p class="dim">Save the current setup as A or B, change it, and compare outcomes side by side.</p>
+    <p class="margin-note">Save the current setup as A or B, change it, and compare outcomes side by side.</p>
     <div class="control-actions">
       <button class="btn" data-action="save-A">Save current as A</button>
       <button class="btn" data-action="save-B">Save current as B</button>
@@ -122,6 +125,7 @@ export function mount(root) {
         <div class="kpi"><dt>Charge at 24:00</dt><dd>${fmt.n(m.endSoC, 0)}<small>%</small></dd></div>
       </dl>`;
 
+    renderFlow(m);
     const band = p.outageHours > 0 ? [{ from: p.outageStart, to: Math.min(24, p.outageStart + p.outageHours), label: 'Grid outage' }] : [];
     lineChart($('#supply-chart', root), {
       height: 300, ariaLabel: 'Hourly supply stacked by source, with demand',
@@ -138,7 +142,7 @@ export function mount(root) {
       ],
       tooltip: (i) => {
         const h = hours[i];
-        return `<strong>${fmt.hour(h.hour)}–${fmt.hour(h.hour + 1)}</strong>${h.outage ? ' <span style="color:var(--rose)">outage</span>' : ''}<br>Demand ${h.demand.toFixed(1)} MW<br>Solar ${h.solar.toFixed(1)} (to load ${h.solarToLoad.toFixed(1)})<br>Battery ${h.discharge > 0 ? `−${h.discharge.toFixed(1)}` : h.charge > 0 ? `+${h.charge.toFixed(1)} charging` : '0'}<br>Grid ${h.grid.toFixed(1)}${h.unserved > 0.01 ? `<br><span style="color:var(--rose)">Unserved ${h.unserved.toFixed(1)}</span>` : ''}${h.curtailed > 0.01 ? `<br>Curtailed ${h.curtailed.toFixed(1)}` : ''}`;
+        return `<strong>${fmt.hour(h.hour)}–${fmt.hour(h.hour + 1)}</strong>${h.outage ? ' <span style="color:var(--orange-text)">outage</span>' : ''}<br>Demand ${h.demand.toFixed(1)} MW<br>Solar ${h.solar.toFixed(1)} (to load ${h.solarToLoad.toFixed(1)})<br>Battery ${h.discharge > 0 ? `−${h.discharge.toFixed(1)}` : h.charge > 0 ? `+${h.charge.toFixed(1)} charging` : '0'}<br>Grid ${h.grid.toFixed(1)}${h.unserved > 0.01 ? `<br><span style="color:var(--orange-text)">Unserved ${h.unserved.toFixed(1)}</span>` : ''}${h.curtailed > 0.01 ? `<br>Curtailed ${h.curtailed.toFixed(1)}` : ''}`;
       },
     });
     lineChart($('#soc-chart', root), {
@@ -146,7 +150,7 @@ export function mount(root) {
       x: { values: hours.map((h) => h.hour), format: fmt.hour },
       y: { min: 0, max: 100, format: (v) => `${v}%` },
       bands: band,
-      hLines: [{ y: p.minSoC, label: 'Reserve floor', color: 'var(--amber)' }],
+      hLines: [{ y: p.minSoC, label: 'Reserve floor', color: 'var(--orange)' }],
       series: [
         { name: 'State of charge (end of hour)', values: hours.map((h) => h.soc), color: COLORS.battery, area: true },
         { name: 'Charging (MW, as % of rating)', values: hours.map((h) => (p.batteryMW ? (h.charge / p.batteryMW) * 100 : 0)), color: COLORS.charge, dash: '2 3', width: 1.3 },
@@ -162,6 +166,32 @@ export function mount(root) {
       <p class="small dim" style="margin-top:1rem">How demand was met (${fmt.n(m.demand, 0)} MWh)</p>
       ${bar([{ label: 'Solar', v: m.solarUsed, c: COLORS.solar }, { label: 'Battery', v: m.discharge, c: COLORS.battery }, { label: 'Grid', v: m.grid, c: COLORS.grid }, { label: 'Unserved', v: m.unserved, c: COLORS.unserved }], m.demand)}
       <p class="small dim">The battery took in ${fmt.n(m.charge, 1)} MWh and delivered ${fmt.n(m.discharge, 1)} MWh. The difference is the change in stored energy plus conversion losses</p>`;
+  }
+
+  function renderFlow(m) {
+    const max = Math.max(m.demand, m.solar, 1);
+    const w = (v) => Math.max(1.2, (v / max) * 30);
+    // Cubic Bézier edge with a label at its midpoint
+    const edge = (p0, c1, c2, p3, v, cls, labelDy = -8) => {
+      if (v <= 0.05) return '';
+      const mid = [0, 1].map((k) => 0.125 * p0[k] + 0.375 * c1[k] + 0.375 * c2[k] + 0.125 * p3[k]);
+      return `<path class="flow-edge ${cls}" d="M${p0} C${c1} ${c2} ${p3}" stroke-width="${w(v).toFixed(1)}"/>
+        <text class="flow-edge-label" x="${mid[0]}" y="${mid[1] + labelDy}" text-anchor="middle">${fmt.n(v, 0)} MWh</text>`;
+    };
+    const node = (x, y, label, val, wd = 158) => `<g class="flow-node"><rect x="${x}" y="${y}" width="${wd}" height="48"/><text x="${x + 10}" y="${y + 20}">${esc(label)}</text><text class="flow-val" x="${x + 10}" y="${y + 37}">${esc(val)}</text></g>`;
+    $('#flow', root).innerHTML = `<svg viewBox="0 0 760 330" class="flow" role="img" aria-label="Daily energy flows: solar ${fmt.n(m.solar, 0)} MWh, battery discharge ${fmt.n(m.discharge, 0)} MWh, grid ${fmt.n(m.grid, 0)} MWh, unserved ${fmt.n(m.unserved, 0)} MWh.">
+      ${edge([178, 52], [380, 52], [420, 150], [586, 150], m.solarUsed, 'is-solar')}
+      ${edge([96, 76], [96, 170], [330, 150], [330, 222], m.charge, 'is-charge', 0)}
+      ${edge([178, 36], [400, 36], [450, 30], [586, 30], m.curtailed, 'is-grid', -10)}
+      ${edge([488, 246], [540, 246], [540, 172], [586, 172], m.discharge, 'is-battery', 0)}
+      ${edge([178, 286], [380, 318], [560, 318], [650, 174], m.grid, 'is-grid', 14)}
+      ${m.unserved > 0.05 ? `<line x1="744" y1="210" x2="700" y2="174" class="flow-edge is-unserved" stroke-width="${w(m.unserved).toFixed(1)}"/><text class="flow-edge-label" x="752" y="232" text-anchor="end">${fmt.n(m.unserved, 0)} MWh unserved</text>` : ''}
+      ${node(20, 28, 'Solar array', `${fmt.n(m.solar, 0)} MWh generated`)}
+      ${node(20, 262, 'Grid', p.outageHours ? `outage ${p.outageHours} h` : `limit ${p.gridCapMW} MW`)}
+      ${node(330, 222, 'Battery', `${p.batteryMWh} MWh, ${p.batteryMW} MW`)}
+      ${node(586, 126, 'Load', `${fmt.n(m.demand, 0)} MWh demand`, 150)}
+      ${m.curtailed > 0.05 ? node(586, 6, 'Curtailed', `${fmt.n(m.curtailed, 0)} MWh`, 150) : ''}
+    </svg>`;
   }
 
   function snapshot() { const { metrics } = simulate(p); return { p: { ...p }, m: metrics }; }

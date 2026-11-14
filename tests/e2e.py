@@ -25,6 +25,9 @@ async def run(page, errors):
     # ---------- Home ----------
     await page.goto(BASE + '#/', wait_until='networkidle')
     check('home renders hero', await page.locator('#hero-title').count() == 1)
+    before = await page.inner_text('#fig1-readout')
+    await page.focus('.fig1-svg'); await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowDown')
+    check('Fig. 1 responds to keyboard', await page.inner_text('#fig1-readout') != before)
     await page.click('.method-step[data-step="2"]')
     await page.click('[data-method-lab="energy"]')
     check('method diagram updates', 'Energy systems lab' in await page.inner_text('.method-detail'))
@@ -82,6 +85,7 @@ async def run(page, errors):
     await set_range(page, '#ctl-overconfidence', 0.3)
     await page.wait_for_timeout(300)
     check('threshold sweep chart', await page.locator('#sweep svg path').count() >= 2)
+    check('scroll explainer rendered', await page.locator('#ex-fig svg').count() == 1)
     await page.click('[data-action="reset"]')
     check('reset', await page.input_value('#ctl-confidence') == '0.64')
     async with page.expect_download() as dl:
@@ -115,6 +119,7 @@ async def run(page, errors):
     await page.goto(BASE + '#/lab/energy', wait_until='networkidle')
     await page.wait_for_selector('#kpis .kpi')
     check('energy default all served', 'All demand served' in await page.inner_text('#kpis'))
+    check('flow diagram rendered', await page.locator('#flow .flow-edge').count() >= 3)
     await page.click('[data-action="save-A"]')
     await page.click('[data-preset="outage"]')
     check('outage -> shortfall', 'All demand served' not in await page.inner_text('#kpis'))

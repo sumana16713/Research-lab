@@ -7,6 +7,9 @@ import { BARRIER_DIMENSIONS, SUPPORTS, assessBarriers, NEEDS, FARM_TYPES, PROGRA
 import { esc, $, $$, details, download, announce, fmt } from '../lib/dom.js';
 import { barList } from '../lib/charts.js';
 
+// My judgement of how far software alone can move each barrier (a hypothesis to test, not a finding)
+const REACH = { awareness: 'Largely', complexity: 'Largely', documentation: 'Partly', time: 'Partly', digital: 'Only with partners', cashflow: 'Little; it can only flag the problem' };
+
 const STATUS = { eligible: 'Likely eligible', conditional: 'Eligible with conditions', ineligible: 'Not eligible' };
 
 export function mount(root) {
@@ -24,23 +27,22 @@ export function mount(root) {
   </header>
 
   <section class="lab-block" aria-labelledby="st-h">
-    <h2 id="st-h" class="block-h">Research status</h2>
-    <dl class="kpis">
-      <div class="kpi"><dt>Discovery interviews with farmers</dt><dd>≈30</dd></div>
-      <div class="kpi"><dt>Barrier dimensions in the framework</dt><dd>${BARRIER_DIMENSIONS.length}</dd></div>
-      <div class="kpi"><dt>Coded findings published</dt><dd>Not yet</dd></div>
-    </dl>
-    <div class="state-empty small" style="margin-top:1rem;border:1px dashed var(--line-strong);border-radius:8px">Coded interview findings are being synthesised and will appear here once they are ready. Until then, the barrier categories below are the research framework the interviews explore, not results.</div>
-    <h3 class="sub-h" style="margin-top:2rem">Research framework</h3>
-    <div class="table-wrap"><table class="data-table framework-table"><thead><tr><th scope="col">Barrier dimension</th><th scope="col">What the interviews explore</th><th scope="col">Design response being tested</th></tr></thead><tbody>
-      ${BARRIER_DIMENSIONS.map((d) => `<tr><td>${esc(d.label)}</td><td>${esc(d.question)}</td><td>${esc(SUPPORTS[d.id])}</td></tr>`).join('')}
+    <h2 id="st-h" class="block-h">Field research</h2>
+    <p class="margin-note">Interview notes are not published here. Coded findings will be added once synthesis is complete; until then, nothing on this page should be read as a result.</p>
+    <p class="pull">About thirty conversations with farmers about how they find, judge and apply for funding.</p>
+    <p class="pull-src">AgriOne discovery interviews, 2026. Status: coding and synthesis in progress.</p>
+    <h3 class="sub-h" style="margin-top:2.5rem">What the conversations explore</h3>
+    <ul class="question-set">${BARRIER_DIMENSIONS.map((d) => `<li><span>${esc(d.label)}</span>${esc(d.question)}</li>`).join('')}</ul>
+    <h3 class="sub-h" style="margin-top:2.5rem">From barrier to design response</h3>
+    <div class="table-wrap"><table class="data-table framework-table"><thead><tr><th scope="col">Barrier</th><th scope="col">Design response being tested</th><th scope="col">Can software address it?</th></tr></thead><tbody>
+      ${BARRIER_DIMENSIONS.map((d) => `<tr><td>${esc(d.label)}</td><td>${esc(SUPPORTS[d.id])}</td><td>${esc(REACH[d.id])}</td></tr>`).join('')}
     </tbody></table></div>
     ${details('Methodology', '<p>Semi-structured discovery interviews with farmers about how they find, assess and apply for funding. Notes are coded against the six barrier dimensions, with room for themes that do not fit them. The product hypothesis is tested against the coded findings, not assumed.</p><p>The barrier assessment below is a demonstration of how the framework could be turned into a short self-assessment. It is not a validated instrument, and its scores are not measurements.</p>')}
   </section>
 
   <section class="lab-block" aria-labelledby="ba-h">
     <h2 id="ba-h" class="block-h">Funding barrier assessment</h2>
-    <p class="dim">Start from a fictional persona or answer the questions yourself.</p>
+    <p class="margin-note">Start from a fictional persona or answer the questions yourself.</p>
     <div class="persona-row" role="group" aria-label="Fictional personas">${PERSONAS.map((p) => `<button class="chip" data-persona="${p.id}" aria-pressed="${p.id === activePersona}">${esc(p.label)}</button>`).join('')}</div>
     <div class="instrument">
       <form class="controls" id="barrier-form" aria-label="Barrier questions" onsubmit="return false">
@@ -56,7 +58,7 @@ export function mount(root) {
 
   <section class="lab-block" aria-labelledby="el-h">
     <h2 id="el-h" class="block-h">Eligibility screening demonstration</h2>
-    <p class="dim">Screens a farm profile against eight fictional programs. Every result shows the rule behind it.</p>
+    <p class="margin-note">Screens a farm profile against eight fictional programs. Every result shows the rule behind it.</p>
     <div class="instrument">
       <form class="controls" id="farm-form" aria-label="Farm profile" onsubmit="return false">
         <fieldset><legend>Farm profile</legend>
@@ -81,7 +83,7 @@ export function mount(root) {
 
   <section class="lab-block research" aria-labelledby="im-h">
     <h2 id="im-h" class="block-h">Impact measurement framework</h2>
-    <p class="dim">How AgriOne's effect would be measured. These are metric definitions only. No values are reported because none have been collected.</p>
+    <p class="margin-note">How AgriOne's effect would be measured. These are metric definitions only. No values are reported because none have been collected.</p>
     <div class="table-wrap"><table class="data-table framework-table"><thead><tr><th scope="col">Stage</th><th scope="col">Metric</th><th scope="col">Why it matters</th></tr></thead><tbody>
       ${IMPACT_METRICS.map((m) => `<tr><td>${esc(m.stage)}</td><td>${esc(m.metric)}</td><td>${esc(m.why)}</td></tr>`).join('')}
     </tbody></table></div>
@@ -94,7 +96,7 @@ export function mount(root) {
     <div class="control-actions"><button class="btn" data-action="download">Download framework summary</button></div>
   </section>`;
 
-  const barrierColor = (v) => (v >= 0.7 ? 'var(--rose)' : v >= 0.45 ? 'var(--amber)' : 'var(--green)');
+  const barrierColor = (v) => (v >= 0.7 ? 'var(--orange)' : v >= 0.45 ? '#c9971a' : 'var(--olive)');
 
   function renderBarriers() {
     const a = assessBarriers(answers);
