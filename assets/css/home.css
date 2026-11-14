@@ -173,3 +173,11 @@
 .state-loading { display: flex; align-items: center; gap: var(--space-3); color: var(--ivory-dim); }
 .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--teal); animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Presentations and honours */
+.creds { margin: 0 0 var(--space-7); gap: var(--space-7); }
+.cred-list { list-style: none; padding: 0; margin: 0; }
+.cred-list li { padding: var(--space-3) 0; border-bottom: 1px solid var(--line); color: var(--ivory-dim); margin: 0; }
+.cred-title { display: block; font-family: var(--serif); font-size: var(--t-md); color: var(--ivory); margin-bottom: 2px; }
+.tl-org .tag { margin-left: 6px; vertical-align: 2px; }
+@media (max-width: 900px) { .creds { grid-template-columns: 1fr; gap: var(--space-5); } }

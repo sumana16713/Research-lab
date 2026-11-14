@@ -1,5 +1,5 @@
 /** Home page: hero, research agenda, labs, projects, experience, interests, CV, contact. */
-import { person, education, agenda, labs, projects, experience, interests, skills } from '../content.js';
+import { person, education, agenda, labs, projects, experience, interests, skills, presentations, honors, toolset } from '../content.js';
 import { esc, $, $$, download, announce } from '../lib/dom.js';
 import { mountHeroNetwork } from '../hero.js';
 import { labPreview } from './previews.js';
@@ -109,12 +109,18 @@ export function renderHome(app) {
           <div class="tl-date">${esc(e.dates)}</div>
           <div class="tl-body">
             <h3>${esc(e.role)}</h3>
-            <p class="tl-org">${esc(e.org)}</p>
+            <p class="tl-org">${esc(e.org)} <span class="tag">${esc(e.group)}</span></p>
             <ul>${e.bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>
             <p class="tl-skills">${e.skills.map((s) => `<span class="tag">${esc(s)}</span>`).join(' ')}</p>
           </div>
         </li>`).join('')}
       </ol>
+      <div class="two-col creds">
+        <div><h3 class="sub-h">Presentations</h3>
+          <ul class="cred-list">${presentations.map((p) => `<li><span class="cred-title">${esc(p.title)}</span><span class="small dim">${esc(p.kind)}, ${esc(p.venue)}, ${esc(p.date)}</span></li>`).join('')}</ul></div>
+        <div><h3 class="sub-h">Selected honours</h3>
+          <ul class="cred-list">${honors.map((h) => `<li>${esc(h)}</li>`).join('')}</ul></div>
+      </div>
       <h3 class="sub-h">Education</h3>
       <dl class="edu">
         ${education.map((e) => `<div><dt>${esc(e.degree)}</dt><dd>${esc(e.school)}<span class="dim"> — ${esc(e.dates)}${e.detail ? `, ${esc(e.detail)}` : ''}</span></dd></div>`).join('')}
@@ -143,12 +149,18 @@ export function renderHome(app) {
         <header><h3>${esc(person.name)}</h3><p class="dim small">${person.fields.map(esc).join(' / ')}</p></header>
         <h4>Education</h4>
         <ul>${education.map((e) => `<li><strong>${esc(e.degree)}</strong>, ${esc(e.school)} — ${esc(e.dates)}${e.detail ? `. ${esc(e.detail)}` : ''}</li>`).join('')}</ul>
-        <h4>Experience</h4>
-        <ul>${experience.map((e) => `<li><strong>${esc(e.role)}</strong>, ${esc(e.org)} — ${esc(e.dates)}</li>`).join('')}</ul>
+        <h4>Research experience</h4>
+        <ul>${experience.filter((e) => e.group === 'Research').map((e) => `<li><strong>${esc(e.role)}</strong>, ${esc(e.org)} — ${esc(e.dates)}. ${esc(e.bullets[0])}</li>`).join('')}</ul>
+        <h4>Industry experience</h4>
+        <ul>${experience.filter((e) => e.group !== 'Research').map((e) => `<li><strong>${esc(e.role)}</strong>, ${esc(e.org)} — ${esc(e.dates)}</li>`).join('')}</ul>
+        <h4>Presentations</h4>
+        <ul>${presentations.map((p) => `<li>“${esc(p.title)}” (${esc(p.kind.toLowerCase())}), ${esc(p.venue)}, ${esc(p.date)}</li>`).join('')}</ul>
+        <h4>Selected honours</h4>
+        <ul>${honors.map((h) => `<li>${esc(h)}</li>`).join('')}</ul>
         <h4>Selected projects</h4>
         <ul>${projects.filter((p) => p.kind === 'past').map((p) => `<li><strong>${esc(p.title)}</strong>${p.org ? `, ${esc(p.org)}` : ''}: ${esc(p.summary)}</li>`).join('')}</ul>
-        <h4>Skills</h4>
-        <p>${skills.map(esc).join(', ')}</p>
+        <h4>Technical skills</h4>
+        <p>${esc(toolset)}</p>
       </article>
     </div>
   </section>

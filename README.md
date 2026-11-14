@@ -27,7 +27,7 @@ Each model is documented in full, with equations, assumptions and limitations, i
 
 This repository keeps real experience separate from new demonstrations:
 
-- **Past work** (SkyAcres / SkyHarvest at Albany State University, NASA MINDS crater detection, AgriOne discovery research, clean energy infrastructure planning) is described using only facts I can confirm. Original code, data and quantitative results from those projects are **not** included or reproduced.
+- **Past work** (Sky Acres, GSCE, NASA MINDS crater detection, NASA Better Together space agriculture, the Providencia RNA-sequencing project, AgriOne discovery research) is described from my CV and resume. Original code, data and quantitative results from those projects are **not** included or reproduced.
 - **The interactive labs are new, independently built demonstrations.** They are not reconstructions of original project code.
 - **All lab data is synthetic, hypothetical or fictional**, and each lab says so on screen. No interview statistics, grant awards, yields or operational results are shown.
 - **The simulations are deterministic.** Every random draw uses a fixed seed, so the same inputs always produce the same outputs.

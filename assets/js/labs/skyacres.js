@@ -38,7 +38,7 @@ const METHODS = [
   ['Crop phenology model', '<p>Field-mean NDVI follows a double-logistic curve: <code>NDVI(t) = soil + (max − soil) · green(t) · senesce(t) · vigour(t)</code>, where green-up and senescence are logistic functions with crop-specific timing. Parameters are illustrative, loosely shaped like peanut, cotton, corn and soybean seasons.</p>'],
   ['Water and heat stress', '<p>A seasonal water-balance factor compares demand (rising ~5 % per °C of warming) with supply (rainfall anomaly × the field\'s water-holding factor, plus irrigation). The deficit reduces canopy vigour progressively from day 25 to day 80. Temperatures more than 2 °C above normal add a small heat penalty.</p>'],
   ['Cloud masking and missing data', '<p>Masked pixels are excluded from zonal statistics. If fewer than 20 % of a field\'s pixels are clear, the lab reports “too cloudy to assess” rather than a misleading average. Honest abstention is part of the method.</p>'],
-  ['Limitations', '<ul><li>All data is synthetic. Field shapes, crop parameters, reflectances and clouds are generated, not observed.</li><li>No atmospheric correction, soil-background or saturation effects are modelled; NDVI saturates in dense canopy in reality.</li><li>The stress model is a teaching simplification, not an agronomic model, and the alert thresholds are not calibrated against yield.</li><li>This is a new, independent reconstruction of the workflow, not the original SkyAcres / SkyHarvest code.</li></ul>'],
+  ['Limitations', '<ul><li>All data is synthetic. Field shapes, crop parameters, reflectances and clouds are generated, not observed.</li><li>No atmospheric correction, soil-background or saturation effects are modelled; NDVI saturates in dense canopy in reality.</li><li>The stress model is a teaching simplification, not an agronomic model, and the alert thresholds are not calibrated against yield.</li><li>This is a new, independent demonstration of the workflow, not Sky Acres platform code.</li></ul>'],
 ];
 
 export function mount(root) {
@@ -49,10 +49,10 @@ export function mount(root) {
 
   root.innerHTML = `
   <header class="lab-head">
-    <p class="lab-kicker"><span class="tag tag-synthetic">Synthetic data</span> <span class="tag tag-demo">Independent reconstruction</span></p>
+    <p class="lab-kicker"><span class="tag tag-synthetic">Synthetic data</span> <span class="tag tag-demo">Independent demonstration</span></p>
     <h1>SkyAcres: geospatial crop intelligence</h1>
     <p class="lab-question">Can satellite-derived indicators give farmers an early, honest warning of crop stress, and say plainly when the data is too poor to tell?</p>
-    <p class="notice"><strong>About this lab.</strong> I worked on satellite-data pipelines, analytics and dashboards for SkyAcres / SkyHarvest at Albany State University. This lab is a new reconstruction of that kind of workflow, built for this portfolio with synthetic fields and imagery. It is not the original project code or data.</p>
+    <p class="notice"><strong>About this lab.</strong> As a Software Engineer at Sky Acres (USG) I built backend features for an agricultural land platform that integrates satellite-derived data. This lab is a new, independent demonstration of a remote-sensing workflow, built for this portfolio with synthetic fields and imagery. It is not Sky Acres code or data.</p>
   </header>
 
   <section class="lab-block" aria-labelledby="map-h">
@@ -235,7 +235,7 @@ export function mount(root) {
       return;
     }
     if (e.target.closest('[data-action="download"]')) {
-      const lines = ['# SkyAcres lab — methodology and current results', '', 'All data is synthetic. Independent reconstruction; not original project code.', '',
+      const lines = ['# SkyAcres lab — methodology and current results', '', 'All data is synthetic. Independent demonstration; not Sky Acres platform code.', '',
         `Date: ${dateOf(cond.day)} (day ${cond.day}); rainfall ${cond.rainfall}% vs normal; temperature ${cond.temperature} °C vs normal; cloud cover ${cond.cloud}%`, '',
         '| Field | Crop | Mean NDVI | Expected | Anomaly | Clear | Status |', '|---|---|---|---|---|---|---|',
         ...stats.map((z) => `| ${z.parcel.id} ${z.parcel.name} | ${z.crop} | ${z.valid ? z.mean.toFixed(3) : '—'} | ${z.baseline.toFixed(3)} | ${z.valid ? z.anomaly.toFixed(3) : '—'} | ${(z.clearFraction * 100).toFixed(0)}% | ${z.risk.label} |`),

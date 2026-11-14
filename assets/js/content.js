@@ -25,7 +25,7 @@ export const person = {
 
 export const education = [
   { school: 'Columbia University', degree: 'M.S. Technology Management', dates: 'Expected December 2027', detail: 'Graduate studies in technology, AI, strategy and organisational decision-making' },
-  { school: 'Albany State University', degree: 'B.S. Computer Science', dates: 'Completed', detail: 'GPA 3.7 / 4.0' },
+  { school: 'Albany State University', degree: 'B.S. Computer Science and Business', dates: 'August 2020 – May 2024', detail: 'GPA 3.7 / 4.0. NCAA Division II women’s tennis, full scholarship' },
 ];
 
 /** Research agenda shown near the top of the home page. */
@@ -57,28 +57,69 @@ export const labs = [
  */
 export const projects = [
   {
-    id: 'skyacres', kind: 'past', title: 'SkyAcres / SkyHarvest', org: 'Albany State University', dates: '2024–2026',
+    id: 'skyacres', kind: 'past', title: 'Sky Acres', org: 'Sky Acres (USG), Albany, GA', dates: '2024–2026',
     domains: ['Remote sensing', 'Agriculture', 'Data engineering'],
-    summary: 'Satellite-data pipelines, agricultural analytics, software integrations and dashboards for a university agricultural technology program.',
+    summary: 'Python backend features for an agricultural land and finance platform that integrates satellite-derived data, AI-assisted land analysis, APIs, asset valuation and digital land registration.',
     lab: 'skyacres',
     caseStudy: [
-      { h: 'Research problem', p: 'Farm decisions depend on knowing how crops are doing across whole fields, often across many fields at once. Satellite imagery can show this, but only after raw scenes are cleaned, turned into indicators, summarised per field and presented in a way people can act on.' },
-      { h: 'My responsibilities', list: ['Developed satellite-data pipelines.', 'Applied Python and geospatial-data processing for agricultural research initiatives.', 'Built agricultural analytics on top of processed imagery.', 'Worked on software integrations between system components.', 'Built dashboards and contributed to technical reporting.'] },
-      { h: 'Methods and architecture', p: 'The general workflow for this kind of system is: acquire imagery → mask clouds and bad pixels → compute vegetation indices such as NDVI → aggregate per field (zonal statistics) → compare against a baseline → surface anomalies in a dashboard. The SkyAcres lab on this site rebuilds that workflow from scratch with synthetic data so it can be explored openly.' },
-      { h: 'Research relevance', p: 'The same pipeline questions — data quality, uncertainty, and how indicators turn into decisions — run through all of my work, including the AI safety sandbox.' },
-      { h: 'About the demonstration', note: 'The interactive SkyAcres lab is a new, independent reconstruction. It is not the original project code, and its data is synthetic.' },
-      { h: 'Limitations', p: 'Original project code, data and quantitative results are not reproduced here. I am happy to discuss the project in more detail directly.' },
+      { h: 'The problem', p: 'Agricultural land is hard to value and finance when information about it is scattered and slow to verify. Sky Acres brings satellite-derived data, AI-assisted land analysis and digital registration into one platform for land registration, valuation and transactions.' },
+      { h: 'My role', p: 'Software Engineer, Data & Platform, May 2024 – May 2026.' },
+      { h: 'What I built', list: [
+        'Python-based backend features integrating satellite-derived data, AI-assisted land analysis, APIs, asset valuation and digital land-registration workflows.',
+        'Python services, API integrations, database queries and user-facing features supporting land registration and valuation. Platform adoption increased by 25%.',
+        'SQL analysis of application and user data, and workflow improvements across registration, valuation and transaction features. Weekly active usage increased by 18%.',
+        'A quarterly roadmap prioritised from 30+ discovery sessions using impact scoring (RICE / MoSCoW), cutting cycle time by 25%.',
+      ] },
+      { h: 'Research relevance', p: 'Turning satellite observations into decisions about land raises the questions that run through all my work: how good is the data, how uncertain is the derived indicator, and who relies on it. The SkyAcres lab on this site explores the remote-sensing side of that pipeline.' },
+      { h: 'About the demonstration', note: 'The interactive SkyAcres lab is a new, independent demonstration of a remote-sensing workflow with synthetic data. It is not Sky Acres platform code or data.' },
     ],
   },
   {
-    id: 'nasa', kind: 'past', title: 'Crater detection', org: 'NASA MINDS', dates: '2021–2022',
+    id: 'nasa', kind: 'past', title: 'Crater detection for Mars rovers', org: 'NASA MINDS, Albany State University', dates: '2021–2024',
     domains: ['Computer vision', 'AI'],
-    summary: 'A student research project on detecting impact craters in planetary imagery with computer vision.',
+    summary: 'Led a five-person team building an object-detection pipeline in Python, TensorFlow and OpenCV to identify surface craters in unstructured terrain.',
     caseStudy: [
-      { h: 'Computer vision problem', p: 'Craters are counted to estimate the age of planetary surfaces and to assess landing hazards. Counting by hand does not scale. Automated detection is hard because craters vary by orders of magnitude in size, overlap and erode, and look different depending on the sun angle when an image was taken.' },
-      { h: 'Why it matters for my research', p: 'The project was an early lesson in a theme I keep returning to: a detector is only useful if you know where it fails — at small scales, under low illumination, or on terrain unlike its training data.' },
-      { h: 'Results', note: 'The original code and experimental results are not reproduced here. I can discuss the methods and outcomes directly.' },
-      { h: 'Future improvements', list: ['Evaluate detection performance separately by crater size and illumination angle.', 'Report calibrated confidence scores rather than raw detections.', 'Test transfer between imagery from different instruments.'] },
+      { h: 'Computer vision problem', p: 'A rover navigating unstructured terrain needs to recognise craters, which vary in size, overlap, erode and look different depending on the light. The project aimed to detect craters automatically from surface imagery.' },
+      { h: 'My role', p: 'Student Researcher, August 2021 – May 2024, advised by Dr Robert Owor. I led a team of five engineers.' },
+      { h: 'Methods and my contributions', list: [
+        'Designed and implemented an object-detection pipeline using Python, TensorFlow and OpenCV.',
+        'Built and maintained training datasets, optimised convolutional neural network architectures, and applied data augmentation to improve robustness and generalisation.',
+        'Ran performance analysis and hyperparameter tuning, reducing inference time by 15% and improving reliability across terrain conditions.',
+        'Coordinated sprint planning and milestones with Agile methods, incorporating stakeholder feedback into each iteration.',
+      ] },
+      { h: 'Why it matters for my research', p: 'A detector is only useful if you know where it fails: at small scales, in low light, or on terrain unlike its training data. That lesson shapes how I approach model reliability and evaluation.' },
+      { h: 'Future improvements', list: ['Report detection performance separately by crater size and illumination angle.', 'Attach calibrated confidence scores to each detection.', 'Test how well the model transfers between imagery from different instruments.'] },
+      { h: 'About this page', note: 'Original project code and data are not reproduced here.' },
+    ],
+  },
+  {
+    id: 'space-ag', kind: 'past', title: 'Space agriculture', org: 'NASA Better Together, Albany State University', dates: '2023–2024',
+    domains: ['Agriculture', 'Experimental research'],
+    summary: 'Led a five-person team developing plant-growth prototypes for simulated extraterrestrial conditions, with automated monitoring of growth conditions.',
+    caseStudy: [
+      { h: 'Research problem', p: 'Growing food in extraterrestrial conditions means keeping plants alive with very limited water and nutrients. The project tested growth prototypes under simulated conditions.' },
+      { h: 'My role', p: 'Student Researcher, August 2023 – May 2024, advised by Dr Robert Owor. I led a team of five.' },
+      { h: 'What we did', list: [
+        'Developed three growth prototypes; plant survival improved by 25% under simulated extraterrestrial conditions.',
+        'Ran 50+ growth trials, increasing average yield by 20% and reducing water and nutrient use by 15% per cycle.',
+        'Designed automated monitoring of growth conditions, cutting manual observation time by 40% and keeping data collection consistent.',
+        'Presented findings to faculty and industry partners.',
+      ] },
+      { h: 'Presentation', p: 'Poster: “Pioneering Space Agriculture: Cultivating Plants with Innovative Techniques”, NASA STEM Better Together Conference, San Jose, CA, November 2023.' },
+    ],
+  },
+  {
+    id: 'providencia', kind: 'past', title: 'Bacterial stress responses from RNA sequencing', org: 'Providencia Project, Albany State University', dates: '2021',
+    domains: ['Bioinformatics', 'Data analysis'],
+    summary: 'Python analysis of RNA sequencing data to study how bacteria respond to salicylate compounds.',
+    caseStudy: [
+      { h: 'Research problem', p: 'How do bacteria change their gene expression when exposed to salicylate compounds, and at what concentrations do those compounds inhibit or kill them?' },
+      { h: 'My role', p: 'Researcher, September – December 2021, advised by Dr Ojo Olabisi, working with the Biology Department.' },
+      { h: 'What I did', list: [
+        'Applied Python to analyse RNA sequencing data, supporting determination of minimum inhibitory concentration (MIC) and minimum bactericidal concentration (MBC).',
+        'Designed computational workflows to track RNA expression changes after exposure to salicylate compounds.',
+        'Worked with biologists to connect RNA-level results to experimentally validated conclusions about bacterial behaviour.',
+      ] },
     ],
   },
   {
@@ -88,22 +129,27 @@ export const projects = [
     lab: 'agrione',
     caseStudy: [
       { h: 'The challenge', p: 'Funding programs for farmers exist, but finding the right one, confirming eligibility, gathering documents and applying takes knowledge and time that many farmers do not have.' },
-      { h: 'Primary research', p: 'I have conducted approximately 30 discovery interviews with farmers to understand how they find, assess and apply for funding.' },
+      { h: 'Primary research', p: 'I have conducted approximately 30 discovery interviews with farmers to understand how they find, assess and apply for funding. My training includes the University of Michigan Summer Institute in Survey Research Techniques (2023).' },
       { h: 'Research framework', p: 'Interviews are organised around six barrier dimensions: awareness, eligibility complexity, documentation readiness, time and capacity, digital access, and cash-flow timing. The AgriOne lab turns this framework into an interactive assessment.' },
       { h: 'Product hypothesis', p: 'If a farm profile is captured once and reused, software can surface relevant programs, explain eligibility in plain language and track missing documents, reducing the effort needed to apply. Whether it does is an empirical question the impact framework is designed to answer.' },
       { h: 'Findings', note: 'Coded interview findings are being synthesised and are not published here yet. Nothing in the AgriOne lab should be read as an interview result.' },
     ],
   },
   {
-    id: 'energy', kind: 'past', title: 'Clean energy infrastructure', org: 'Professional work', dates: '',
-    domains: ['Energy', 'Infrastructure'],
-    summary: 'Clean energy infrastructure planning involving renewable energy, battery storage and technology systems.',
+    id: 'energy', kind: 'past', title: 'Energy and infrastructure data workflows', org: 'GSCE (Green Structures & Clean Energy)', dates: '2026',
+    domains: ['Energy', 'Infrastructure', 'Data engineering'],
+    summary: 'Python and SQL data workflows across energy, site-selection and infrastructure datasets for AI-driven feasibility and deployment analysis.',
     lab: 'energy',
     caseStudy: [
-      { h: 'Scope', p: 'I have worked on clean energy infrastructure planning involving renewable energy, battery storage and the technology systems that connect them.' },
+      { h: 'My role', p: 'Technical Product Analyst, GSCE (remote), June – August 2026.' },
+      { h: 'What I did', list: [
+        'Built Python and SQL data workflows across energy, site-selection and infrastructure datasets to support AI-driven technical feasibility and deployment analysis.',
+        'Defined model inputs, output variables, data pipelines and integration requirements for AI-based energy optimisation and data-centre infrastructure use cases.',
+        'Translated operational requirements from engineering and business stakeholders into APIs, data schemas, system requirements and implementation plans.',
+      ] },
       { h: 'Technical considerations', list: ['Matching variable renewable output to demand that peaks at different times.', 'Sizing storage by both energy (MWh) and power (MW), which constrain different things.', 'Planning for grid constraints and outages, not just average conditions.'] },
       { h: 'Research questions', list: ['How should storage be sized when the goal is reliability during outages rather than cost?', 'Which simple models are good enough for early planning, and where do they break?', 'Where can automated dispatch be trusted, and where should operators stay in the loop?'] },
-      { h: 'About the demonstration', note: 'The Energy lab is an independent teaching model built for this site. It is not an operational grid model or a reproduction of project work.' },
+      { h: 'About the demonstration', note: 'The Energy lab is an independent teaching model built for this site. It is not an operational grid model or a reproduction of GSCE work.' },
     ],
   },
   { id: 'demo-safety', kind: 'demo', title: 'Human oversight sandbox', org: 'Independent demonstration', dates: '2026', domains: ['AI safety', 'Energy'], summary: 'Rule-based oversight gating, audit logs, sensitivity analysis and a Monte Carlo study of oversight thresholds.', lab: 'safety' },
@@ -112,20 +158,52 @@ export const projects = [
   { id: 'demo-agrione', kind: 'demo', title: 'Funding access screener', org: 'Independent demonstration', dates: '2026', domains: ['Agriculture', 'User research'], summary: 'Barrier assessment and eligibility screening against clearly fictional programs.', lab: 'agrione' },
 ];
 
-/** Experience timeline. `skills` power the skill filter. Keep bullets to things you can confirm. */
+/**
+ * Experience timeline, newest first. `group` separates research from industry roles.
+ * `skills` power the skill filter. Source: my resume and CV.
+ */
 export const experience = [
-  { role: 'Scientific Officer', org: 'Albany State University', start: '2024-10', end: '2026-06', dates: 'Oct 2024 – Jun 2026',
-    bullets: ['Contributed to agricultural software and satellite-data applications, dashboards, integration and technical reporting.'],
-    skills: ['Research coordination', 'Data analytics', 'Satellite data', 'Software development'] },
-  { role: 'Research Assistant', org: 'Albany State University', start: '2024-06', end: '2024-10', dates: 'Jun 2024 – Oct 2024',
-    bullets: ['Worked on SkyAcres / SkyHarvest: satellite-data pipelines, agricultural analytics, software integrations and dashboards.', 'Applied Python and geospatial-data processing for agricultural research initiatives.'],
-    skills: ['Python', 'Satellite data', 'ETL pipelines', 'Data analytics', 'Software development'] },
-  { role: 'Information and Digital Solutions Intern', org: 'Eli Lilly and Company', start: '2023-05', end: '2023-08', dates: 'May 2023 – Aug 2023',
-    bullets: ['Supported ETL workflows, data integration and operational technology projects.'],
-    skills: ['ETL pipelines', 'Software development', 'Data analytics'] },
-  { role: 'Research project: crater detection', org: 'NASA MINDS', start: '2021-01', end: '2022-12', dates: '2021 – 2022',
-    bullets: ['Participated in a computational crater-detection project applying computer vision to planetary imagery.'],
-    skills: ['Python', 'AI applications', 'Computer vision'] },
+  { role: 'Technical Product Analyst', org: 'GSCE (Green Structures & Clean Energy), Remote', group: 'Industry', dates: 'Jun 2026 – Aug 2026',
+    bullets: ['Built Python and SQL data workflows across energy, site-selection and infrastructure datasets to support AI-driven feasibility and deployment analysis.', 'Defined model inputs, outputs, data pipelines and integration requirements for AI-based energy optimisation and data-centre infrastructure use cases.'],
+    skills: ['Python', 'SQL', 'Data pipelines', 'AI applications'] },
+  { role: 'Software Engineer, Data & Platform', org: 'Sky Acres (USG), Albany, GA', group: 'Industry', dates: 'May 2024 – May 2026',
+    bullets: ['Built Python backend features for an agricultural land and finance platform integrating satellite-derived data, AI-assisted land analysis, APIs, asset valuation and digital land registration.', 'Developed services, API integrations and database queries for registration and valuation workflows; platform adoption rose 25% and weekly active usage 18%.'],
+    skills: ['Python', 'SQL', 'Satellite data', 'APIs', 'Software development'] },
+  { role: 'Student Researcher, space agriculture', org: 'NASA Better Together, Albany State University', group: 'Research', dates: 'Aug 2023 – May 2024',
+    bullets: ['Led a five-person team developing three plant-growth prototypes for simulated extraterrestrial conditions across 50+ growth trials.', 'Designed automated monitoring of growth conditions. Advisor: Dr Robert Owor.'],
+    skills: ['Experimental design', 'Data analysis', 'Research leadership'] },
+  { role: 'IDS Analyst Intern', org: 'Eli Lilly and Company, Indianapolis, IN', group: 'Industry', dates: 'May 2023 – Aug 2023',
+    bullets: ['Developed predictive analytics pipelines on AWS (S3, EC2, Lambda) to automate data ingestion and processing in a regulated environment, cutting manual processing by 70%.', 'Defined product KPIs and built SQL and Tableau dashboards to monitor usage funnels.'],
+    skills: ['Python', 'SQL', 'AWS', 'Data pipelines', 'Data analysis'] },
+  { role: 'Student Researcher, crater detection', org: 'NASA MINDS, Albany State University', group: 'Research', dates: 'Aug 2021 – May 2024',
+    bullets: ['Led a team of five building an object-detection pipeline in Python, TensorFlow and OpenCV to identify craters for Mars rovers.', 'Curated training data, optimised CNN architectures, applied data augmentation and tuned hyperparameters, reducing inference time by 15%. Advisor: Dr Robert Owor.'],
+    skills: ['Python', 'Computer vision', 'Machine learning', 'Research leadership'] },
+  { role: 'Researcher, Providencia Project', org: 'Albany State University', group: 'Research', dates: 'Sep 2021 – Dec 2021',
+    bullets: ['Analysed RNA sequencing data in Python to study bacterial stress responses to salicylate compounds, supporting MIC and MBC determination. Advisor: Dr Ojo Olabisi.'],
+    skills: ['Python', 'Data analysis'] },
+  { role: 'Product Management Intern', org: 'Grus & Grade, India', group: 'Industry', dates: 'May 2022 – Jul 2023',
+    bullets: ['Prioritised features using customer-lifecycle data and 70+ user interviews; ran A/B tests on onboarding.'],
+    skills: ['User research', 'Data analysis'] },
+  { role: 'Co-founder, Product Lead', org: 'SquarExchange, Remote', group: 'Industry', dates: 'May 2021 – Apr 2023',
+    bullets: ['Defined the MVP roadmap from 40+ user interviews and scaled the product to 1,000+ users.'],
+    skills: ['User research', 'Research leadership'] },
+];
+
+/** Posters and talks. */
+export const presentations = [
+  { title: 'Pioneering Space Agriculture: Cultivating Plants with Innovative Techniques', venue: 'NASA STEM Better Together Conference, San Jose, CA', date: 'November 2023', kind: 'Poster' },
+  { title: 'Enhancing Data Processing Efficiency with AWS Glue and Lambda', venue: 'Summer Internship Poster Session, Eli Lilly and Company, Indianapolis, IN', date: 'August 2023', kind: 'Poster' },
+];
+
+/** Selected honours. */
+export const honors = [
+  'Summer Institute in Survey Research Techniques Fellowship, University of Michigan (2023)',
+  'NASA STEM Recipient (2023)',
+  'Eli Lilly Hackathon, Best Design Award (2023)',
+  'TMCF Leadership Institute (2022, 2023)',
+  'NCAA Women’s Tennis full scholarship (2020–2024)',
+  'Velma Fudge Grant Honors Program (2022–2024)',
+  'Highest Ranking Freshman Award (2020–2021); Dean’s List (2020–2021)',
 ];
 
 export const interests = [
@@ -136,4 +214,7 @@ export const interests = [
   { title: 'Technology access and adoption', body: 'Why useful tools and public programs fail to reach the people they are designed for, and what design can change.' },
 ];
 
-export const skills = ['Python', 'Data analytics', 'Satellite data', 'ETL pipelines', 'Software development', 'AI applications', 'Computer vision', 'Research coordination'];
+export const skills = ['Python', 'SQL', 'Machine learning', 'Computer vision', 'Satellite data', 'Data pipelines', 'AWS', 'APIs', 'Data analysis', 'User research', 'Research leadership'];
+
+/** Full technical skills, shown on the CV. */
+export const toolset = 'Python, SQL, TensorFlow, OpenCV, AWS (S3, EC2, Lambda), REST APIs, Snowflake, Oracle, Tableau, machine learning, predictive analytics, data pipelines, JIRA, Confluence';
