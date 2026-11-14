@@ -67,7 +67,7 @@ docs/
 tests/
   models.test.mjs          Unit tests for the models (Node built-in test runner)
   e2e.py                   Browser test that clicks every control on desktop and mobile
-.github/workflows/tests.yml  Runs the model unit tests on every push
+.github/workflows/pages.yml  Runs the unit tests, then deploys to GitHub Pages
 ```
 
 Models are kept separate from the interface so they can be tested and read on their own.
@@ -99,13 +99,13 @@ At the time of writing: 13/13 unit tests and 105/105 end-to-end checks pass, wit
 
 ## Deployment
 
-The site is plain static files at the repository root, so GitHub Pages serves it directly with no build step.
+The workflow in `.github/workflows/pages.yml` runs the model unit tests and then publishes the site to GitHub Pages on every push to `main`.
 
-1. On GitHub, open **Settings → Pages**.
-2. Under **Build and deployment**, set **Source** to **Deploy from a branch**, then choose `main` and `/ (root)`, and save.
-3. After a minute or two the site is live at `https://sumana16713.github.io/research-lab/`. Every push to `main` redeploys it.
+1. On GitHub, open **Settings → Pages** and make sure **Source** is set to **GitHub Actions**.
+2. Push to `main`, or run the workflow from the **Actions** tab.
+3. The site is live at `https://sumana16713.github.io/research-lab/`.
 
-`.nojekyll` tells Pages to serve the files as-is. All paths are relative, so the site also works under a custom domain. The `Tests` workflow in `.github/workflows/tests.yml` runs the model unit tests on every push.
+All paths are relative, so the site also works under a custom domain.
 
 ## Updating content
 
