@@ -2,7 +2,7 @@
 
 An interactive research portfolio covering applied AI, remote sensing, energy systems and AI safety. It contains four working research labs, project case studies, an experience timeline and a printable CV.
 
-**Live site:** `https://sumana16713.github.io/Research-lab/` (after GitHub Pages is enabled, see [Deployment](#deployment))
+**Live site:** https://sumana16713.github.io/Research-lab/
 
 ![Home page](docs/screenshots/home.jpg)
 
