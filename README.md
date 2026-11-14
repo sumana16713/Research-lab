@@ -2,7 +2,7 @@
 
 An interactive research portfolio covering applied AI, remote sensing, energy systems and AI safety. It contains four working research labs, project case studies, an experience timeline and a printable CV.
 
-**Live site:** `https://sumana16713.github.io/research-lab/` (after GitHub Pages is enabled, see [Deployment](#deployment))
+**Live site:** `https://sumana16713.github.io/Research-lab/` (after GitHub Pages is enabled, see [Deployment](#deployment))
 
 ![Home page](docs/screenshots/home.jpg)
 
@@ -103,7 +103,7 @@ The workflow in `.github/workflows/pages.yml` runs the model unit tests and then
 
 1. On GitHub, open **Settings → Pages** and make sure **Source** is set to **GitHub Actions**.
 2. Push to `main`, or run the workflow from the **Actions** tab.
-3. The site is live at `https://sumana16713.github.io/research-lab/`.
+3. The site is live at `https://sumana16713.github.io/Research-lab/`.
 
 All paths are relative, so the site also works under a custom domain.
 
